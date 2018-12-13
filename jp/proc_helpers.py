@@ -209,6 +209,49 @@ def create_buffer_point_polygon_overlay(df, buff_dist=2000, method='difference',
     
     return gpd.overlay(pt_df, df, how=method)
 
+def create_buffer_point_polygon_overlay_v2(df, buff_dist=2000, method='difference', num_points_fld='NUMHHtest', oid_fld='NewID'):
+    """Generate <num_points> random points within a geometry.
+    
+    Parameters
+    ---------------------------------
+    df: a GeoPandas GeoDataFrame
+        This is the geometry within which a random point will be generated.
+    
+    buff_dist: number of points to generate within the polygon
+        See above.
+        
+    method: see GeoPandas overlay doc for how=keyword
+    
+    num_points_fld: field containing number of points to generate
+    
+    oid_fld: field containing value to assign each geometry created within a village
+    
+    Usage Notes
+    ---------------------------------
+    This currently will ony work for num_pts_per_poly=1
+    
+    """
+    
+        
+    # generate the points. with 
+    points_ls = []
+    dfs = []
+    for i,geom in enumerate(df['geometry']):
+        
+        # get the number of points
+        num_points = int(df[num_points_fld][i])
+        points = random_points_within(geom, num_points=num_points)
+        #points = [item for sublist in points for item in sublist]
+        newids = [df[oid_fld][i]] * num_points
+        
+        this_gdf = gpd.GeoDataFrame({'geometry': points, 'NewID': newids})
+        dfs.append(this_gdf)
+        
+    pt_df = gpd.GeoDataFrame(pd.concat(dfs, ignore_index=True))
+    pt_df['geometry'] = pt_df.buffer(buff_dist)
+    
+    return gpd.overlay(pt_df, df, how=method)
+
 
 ## define a function to process an individual file
 def summarize_ndvi_with_qa_file(ndvi_file, qa_file, geom, method='median'):
@@ -304,10 +347,10 @@ def summarize_ndvi_with_qa_dir(ndvi_dir, qa_dir, geo_df, method='median'):
     """
     
     # get the filepaths for the ndvi and pixel_qa files
-    qa_dir = '../landsat/test/qa/'
+    #qa_dir = '../landsat/test/qa/'
     qa_files = sorted(glob(qa_dir + '*.tif')) # sorted helps ensure the filenames match
 
-    ndvi_dir = '../landsat/test/ndvi/'
+    #ndvi_dir = '../landsat/test/ndvi/'
     ndvi_files = sorted(glob(ndvi_dir + '*.tif')) # sorted helps ensure the filenames match
     
     # do the sorting by acquisition date
@@ -380,10 +423,10 @@ def pp_summarize_ndvi_with_qa_dir(ndvi_dir, qa_dir, geo_df, method='median'):
     """
     
     # get the filepaths for the ndvi and pixel_qa files
-    qa_dir = '../landsat/test/qa/'
+    #qa_dir = '../landsat/test/qa/'
     qa_files = sorted(glob(qa_dir + '*.tif')) # sorted helps ensure the filenames match
 
-    ndvi_dir = '../landsat/test/ndvi/'
+    #ndvi_dir = '../landsat/test/ndvi/'
     ndvi_files = sorted(glob(ndvi_dir + '*.tif')) # sorted helps ensure the filenames match
     
     # do the sorting by acquisition date
