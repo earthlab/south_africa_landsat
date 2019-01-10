@@ -196,7 +196,7 @@ def create_buffer_point_polygon_overlay(df, buff_dist=2000, method='difference',
     
     Usage Notes
     ---------------------------------
-    This currently will ony work for num_pts_per_poly=1
+    
     
     """
     
@@ -222,13 +222,13 @@ def create_buffer_point_polygon_overlay_v2(df, buff_dist=2000, method='differenc
         
     method: see GeoPandas overlay doc for how=keyword
     
-    num_points_fld: field containing number of points to generate
+    num_points_fld: field containing number of points to generate within associated geometry
     
     oid_fld: field containing value to assign each geometry created within a village
     
     Usage Notes
     ---------------------------------
-    This currently will ony work for num_pts_per_poly=1
+    
     
     """
     
