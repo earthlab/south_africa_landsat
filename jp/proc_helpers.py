@@ -252,6 +252,62 @@ def create_buffer_point_polygon_overlay_v2(df, buff_dist=2000, method='differenc
     
     return gpd.overlay(pt_df, df, how=method)
 
+def create_buffer_point_polygon_overlay_v3(df, buff_dist=2000, method='difference', num_points_fld='NUMHHtest', oid_fld='NewID', erase_shp_files = []):
+    """Generate <num_points> random points within a geometry.
+    
+    Parameters
+    ---------------------------------
+    df: a GeoPandas GeoDataFrame
+        This is the geometry within which a random point will be generated.
+    
+    buff_dist: number of points to generate within the polygon
+        See above.
+        
+    method: see GeoPandas overlay doc for how=keyword
+    
+    num_points_fld: field containing number of points to generate within associated geometry
+    
+    oid_fld: field containing value to assign each geometry created within a village
+    
+    Usage Notes
+    ---------------------------------
+    
+    
+    """
+    
+        
+    # generate the points. with 
+    points_ls = []
+    dfs = []
+    for i,geom in enumerate(df['geometry']):
+        
+        # get the number of points
+        num_points = int(df[num_points_fld][i])
+        points = random_points_within(geom, num_points=num_points)
+        #points = [item for sublist in points for item in sublist]
+        newids = [df[oid_fld][i]] * num_points
+        
+        this_gdf = gpd.GeoDataFrame({'geometry': points, 'NewID': newids})
+        dfs.append(this_gdf)
+        
+    pt_df = gpd.GeoDataFrame(pd.concat(dfs, ignore_index=True))
+    pt_df['geometry'] = pt_df.buffer(buff_dist)
+    
+    new_df = gpd.overlay(pt_df, df, how=method)
+    
+    for erase_shp in erase_shp_files:
+        
+        # load the new shape file and make sure it has the same spatial reference 
+        temp_df = gpd.read_file(erase_shp)
+        assert temp_df.crs == df.crs
+        
+        # erase the geometry from the buffered point dataframe
+        new_df = gpd.overlay(new_df, temp_df, how=method)
+    
+    # ensure same CRS
+    new_df.crs = df.crs
+    
+    return new_df
 
 ## define a function to process an individual file
 def summarize_ndvi_with_qa_file(ndvi_file, qa_file, geom, method='median'):
