@@ -269,6 +269,8 @@ def create_buffer_point_polygon_overlay_v3(df, buff_dist=2000, method='differenc
     
     oid_fld: field containing value to assign each geometry created within a village
     
+    erase_shp_files: list containing paths to additional shapefiles for which to erase from buffered household geometries
+    
     Usage Notes
     ---------------------------------
     
