@@ -521,6 +521,8 @@ def pp_summarize_ndvi_with_qa_dir(ndvi_dir, qa_dir, geo_df, method='median'):
         
         # process in parallel
         vals = pool.map(partial(summarize_ndvi_with_qa_file, ndvi_fi, qa_fi, method=method), geo_df['geometry'])
+        pool.close()
+        pool.join()
         
         # vals should have one value for each geometry
         all_vals.append(vals)
