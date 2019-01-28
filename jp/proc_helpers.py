@@ -311,6 +311,52 @@ def create_buffer_point_polygon_overlay_v3(df, buff_dist=2000, method='differenc
     
     return new_df
 
+## define a function to take in dataframe of points instead of randomly generating them
+def buffer_point_polygon_overlay(df, buff_dist=2000, method='difference', oid_fld='NewID', erase_shp_files = []):
+    """Generate <num_points> random points within a geometry.
+    
+    Parameters
+    ---------------------------------
+    df: a GeoPandas GeoDataFrame
+        This is a GeoDataFrame which contains the point geometries.
+    
+    buff_dist: number of points to generate within the polygon
+        See above.
+        
+    method: see GeoPandas overlay doc for how=keyword
+    
+    num_points_fld: field containing number of points to generate within associated geometry
+    
+    oid_fld: field containing value to assign each geometry created within a village
+    
+    erase_shp_files: list containing paths to additional shapefiles for which to erase from buffered household geometries
+    
+    Usage Notes
+    ---------------------------------
+    
+    
+    """
+        
+    # Replace the dataframe geometries with buffers
+    df['geometry'] = df['geometry'].buffer(buff_dist)
+    new_df = df.copy()
+    
+    # Iteratively erase the additional geometries    
+    for erase_shp in erase_shp_files:
+        
+        # load the new shape file and make sure it has the same spatial reference 
+        temp_df = gpd.read_file(erase_shp)
+        print(temp_df.crs, df.crs)
+        assert temp_df.crs['init'] == df.crs['init']
+        
+        # erase the geometry from the buffered point dataframe
+        new_df = gpd.overlay(new_df, temp_df, how=method)
+    
+    # ensure same CRS
+    new_df.crs = df.crs
+    
+    return new_df
+    
 ## define a function to process an individual file
 def summarize_ndvi_with_qa_file(ndvi_file, qa_file, geom, method='median'):
     
