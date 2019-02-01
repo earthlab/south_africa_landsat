@@ -579,7 +579,8 @@ def pp_summarize_ndvi_with_qa_dir(ndvi_dir, qa_dir, geo_df, method='median'):
         
     # merge the data frame to the original data frame
     landsat_columns = ['d_'+ os.path.basename(f).split('_')[3] for f in qa_files]
-    ndvi_df = geo_df.join(pd.DataFrame(np.array(all_vals).T, columns=landsat_columns), how='outer')
+    #ndvi_df = geo_df.join(pd.DataFrame(np.array(all_vals).T, columns=landsat_columns), how='outer') # this is causing NaN values and incorrect array shape
+    ndvi_df = geo_df.join(pd.DataFrame(np.array(all_vals).T, columns=landsat_columns)) # this looks good!
     
     return  ndvi_df.to_crs(epsg=epsg_df)
 
