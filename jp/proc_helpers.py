@@ -252,7 +252,7 @@ def create_buffer_point_polygon_overlay_v2(df, buff_dist=2000, method='differenc
     
     return gpd.overlay(pt_df, df, how=method)
 
-def create_buffer_point_polygon_overlay_v3(df, buff_dist=2000, method='difference', num_points_fld='NUMHHtest', oid_fld='NewID', erase_shp_files = []):
+def create_buffer_point_polygon_overlay_v3(df, buff_dist=2000, method='difference', num_points_fld='NUMHHtest', oid_fld='NewID', erase_shp_files = [], save_pt_df=False, pt_df_filepath=''):
     """Generate <num_points> random points within a geometry.
     
     Parameters
@@ -295,6 +295,12 @@ def create_buffer_point_polygon_overlay_v3(df, buff_dist=2000, method='differenc
     pt_df = gpd.GeoDataFrame(pd.concat(dfs, ignore_index=True))
     pt_df['geometry'] = pt_df.buffer(buff_dist)
     
+    if save_pt_df:
+        if not (len(pt_df_filepath) > 0):
+            print('provide valid filepath')
+        pt_df.to_file(pt_df_filepath)
+        
+        
     new_df = gpd.overlay(pt_df, df, how=method)
     
     for erase_shp in erase_shp_files:
