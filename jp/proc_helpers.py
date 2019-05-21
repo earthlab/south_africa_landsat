@@ -425,6 +425,8 @@ def summarize_ndvi_with_qa_file(ndvi_file, qa_file, geom, method='median'):
         calc_val = np.ma.max(ma_n_arr) / sf
     elif method == 'min':
         calc_val = np.ma.min(ma_n_arr) / sf
+    elif method == 'sum':
+        calc_val = np.ma.sum(ma_n_arr) / sf
     else:
         calc_val = -9999
         
